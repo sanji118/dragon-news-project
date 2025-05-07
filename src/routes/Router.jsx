@@ -19,7 +19,7 @@ const Router = createBrowserRouter([
     children: [
       {
         index: true, // index route use korle path='' dorkar nai
-        element: <Navigate to='/category/01' replace />
+        element: <Navigate to='/category/1' replace />
       },
       {
         path: 'category/:id',

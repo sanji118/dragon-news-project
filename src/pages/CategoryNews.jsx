@@ -10,7 +10,7 @@ const CategoryNews = () => {
 
     //category id onujayi filter kore nibo
     const categoryNews = data.filter(news => news.category_id === id);
-    console.log(categoryNews)
+    //console.log(categoryNews)
     
   return (
     <div >

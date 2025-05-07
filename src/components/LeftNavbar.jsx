@@ -9,11 +9,12 @@ const LeftNavbar = () => {
         fetch('/demo-data/categories.json')
         .then(res => res.json())
         .then (data =>{
-            console.log(data);
             setCategories(data)
         })
-        .catch(error => console.log(error))
-        
+        .catch(error => {
+            const errorMessage = error.message;
+            //console.log(error))
+        });
         
     }, []);
 

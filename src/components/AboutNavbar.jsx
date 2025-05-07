@@ -1,15 +1,20 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import swimming from '../assets/image/swimming.png';
 import classroom from '../assets/image/class.png';
 import playground from '../assets/image/playground.png';
 import bg from '../assets/image/bg.png'
 import SocialLogin from './SocialLogin';
 import FindUs from './FindUs';
+import { AuthContext } from '../Provider/AuthProvider';
 
 const AboutNavbar = () => {
+  const {user} = useContext(AuthContext);
   return (
     <div>
-        <SocialLogin></SocialLogin>
+      {
+        !user && <div className="transition duration-500 ease-in-out"><SocialLogin /></div>
+      }
+        
         <FindUs></FindUs>
         <div className='bg-[#F3F3F3] my-5'>
             <h2 className='text-2xl font-bold p-5'>Q-Zone</h2>
