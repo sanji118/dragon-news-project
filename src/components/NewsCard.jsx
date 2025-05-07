@@ -1,20 +1,61 @@
-import { FaRegEye, FaStar, FaRegBookmark, FaShareAlt } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { FaRegEye, FaStar, FaRegBookmark, FaBookmark, FaShareAlt } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
+import { useContext, useState } from 'react';
+import { AuthContext } from '../Provider/AuthProvider';
 
 const NewsCard = ({ news }) => {
-  // Create preview text using slice (first 150 characters)
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const [bookmarked, setBookmarked] = useState(false);
+
+  // Toast function
+  const showToast = (message, type = 'info') => {
+    const toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) return;
+
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type} shadow-lg mb-2 animate-fade-in`;
+    toast.innerHTML = `
+      <span>${message}</span>
+    `;
+
+    toastContainer.appendChild(toast);
+
+    // Auto remove toast after 2.5s
+    setTimeout(() => {
+      toast.remove();
+    }, 2500);
+  };
+
+  // Share handler
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.origin + `/news/${news._id}`);
+    showToast('Link copied to clipboard!', 'success');
+  };
+
+  // Bookmark handler
+  const handleBookmark = () => {
+    if (!user) {
+      navigate('/auth/login');
+      return;
+    }
+    const newState = !bookmarked;
+    setBookmarked(newState);
+    showToast(newState ? 'Bookmark added!' : 'Bookmark removed!', 'success');
+  };
+
   const previewText = news.details.slice(0, 150) + (news.details.length > 150 ? '...' : '');
 
-  // Calculate rating for stars
+  // Rating calculation
   const rating = news.rating.number;
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 >= 0.5;
 
   return (
     <div className="card border border-[#E7E7E7] shadow-sm rounded-lg overflow-hidden mb-5">
-      {/* Top section with author, date, and action icons */}
+      {/* Top section with author, date, and icons */}
       <div className="flex bg-gray-200 items-center justify-between p-4">
-        {/* Author info */}
         <div className="flex items-center gap-2">
           <div className="avatar">
             <div className="w-10 rounded-full">
@@ -33,30 +74,38 @@ const NewsCard = ({ news }) => {
           </div>
         </div>
 
-        {/* Right side with action icons */}
+        {/* Action icons */}
         <div className="flex items-center gap-3">
-          <div className="flex gap-2 ml-2">
-            {/* Bookmark icon */}
-            <button className="text-gray-500 hover:text-primary transition-colors">
-              <FaRegBookmark className="w-4 h-4" />
-            </button>
+          <button
+            onClick={handleBookmark}
+            className="text-gray-500 hover:text-primary transition-colors"
+            title={bookmarked ? 'Remove Bookmark' : 'Bookmark'}
+          >
+            {bookmarked ? (
+              <FaBookmark className="w-5 h-5 text-purple-600" />
+            ) : (
+              <FaRegBookmark className="w-5 h-5" />
+            )}
+          </button>
 
-            {/* Share icon */}
-            <button className="text-gray-500 hover:text-primary transition-colors">
-              <FaShareAlt className="w-4 h-4" />
-            </button>
-          </div>
+          <button
+            onClick={handleShare}
+            className="text-gray-500 hover:text-primary transition-colors"
+            title="Share"
+          >
+            <FaShareAlt className="w-5 h-5" />
+          </button>
         </div>
       </div>
 
       {/* Divider */}
       <div className="border-t border-gray-200"></div>
 
-      {/* Rest of the card content */}
+      {/* Content */}
       <div className="p-4">
         <h2 className="card-title text-xl font-bold mb-2">{news.title}</h2>
 
-        {/* Tags and source */}
+        {/* Tags */}
         <div className="mb-4">
           {news.others_info.is_trending && (
             <span className="badge badge-primary">Trending</span>
@@ -65,37 +114,26 @@ const NewsCard = ({ news }) => {
 
         {/* Image */}
         <figure className="mb-4">
-          <img
-            src={news.image_url}
-            alt={news.title}
-            className="w-full h-auto rounded-lg"
-          />
+          <img src={news.image_url} alt={news.title} className="w-full h-auto rounded-lg" />
         </figure>
 
-        {/* Preview text */}
+        {/* Preview */}
         <div className="mb-4 text-gray-700">
-            <p>
-                {previewText}{' '}
-                <Link
-                to={`/news/${news._id}`}
-                className=" hover:underline font-medium"
-                >
-                Read More
-                </Link>
-            </p>
+          <p>
+            {previewText}{' '}
+            <Link to={`/news/${news._id}`} className=" hover:underline font-medium">
+              Read More
+            </Link>
+          </p>
         </div>
 
-
-        {/* Footer with metadata */}
+        {/* Footer */}
         <div className="flex justify-between items-center mt-4">
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-0.5">
-              {/* Full stars */}
               {[...Array(fullStars)].map((_, i) => (
                 <FaStar key={`full-${i}`} className="text-yellow-400 w-4 h-4" />
               ))}
-
-              {/* Half star */}
               {hasHalfStar && (
                 <div className="relative w-4 h-4">
                   <FaStar className="text-gray-300 absolute top-0 left-0 w-4 h-4" />
@@ -104,8 +142,6 @@ const NewsCard = ({ news }) => {
                   </div>
                 </div>
               )}
-
-              {/* Empty stars */}
               {[...Array(5 - fullStars - (hasHalfStar ? 1 : 0))].map((_, i) => (
                 <FaStar key={`empty-${i}`} className="text-gray-300 w-4 h-4" />
               ))}
@@ -127,3 +163,4 @@ const NewsCard = ({ news }) => {
 };
 
 export default NewsCard;
+

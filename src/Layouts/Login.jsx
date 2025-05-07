@@ -1,22 +1,12 @@
 import { Link } from "react-router-dom";
 import { FiEye } from "react-icons/fi";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import auth from "../components/_auth_";
+
+import auth from "../components/firebase.init";
 
 const Login = () => {
-  const provider = new GoogleAuthProvider();
 
 
-  signInWithPopup(auth, provider)
-  .then(result =>{
-    const user = GoogleAuthProvider.credentialFromResult(result);
-    const token = user.accessToken;
-    
-  })
-  .catch(error =>{
-    const errorMessage = error.messsage;
-    console.log(errorMessage);
-  })
+  
 
   const handleLogin = (e) =>{
     e.preventDefault();
